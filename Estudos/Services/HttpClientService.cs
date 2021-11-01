@@ -53,9 +53,9 @@ namespace Estudos.Services
             var url = $"{_baseUrl}/posts";
 
             var body = new StringContent(
-                JsonSerializer.Serialize(data, _options),
-                Encoding.UTF8,
-                "application/json");
+                content: JsonSerializer.Serialize(data, _options),
+                encoding: Encoding.UTF8,
+                mediaType: "application/json");
 
             using var response = await _client.PostAsync(url, body);
 
@@ -73,9 +73,9 @@ namespace Estudos.Services
             var url = $"{_baseUrl}/posts/{id}";
 
             var body = new StringContent(
-                JsonSerializer.Serialize(data, _options),
-                Encoding.UTF8,
-                "application/json");
+                content: JsonSerializer.Serialize(data, _options),
+                encoding: Encoding.UTF8,
+                mediaType: "application/json");
 
             using var response = await _client.PutAsync(url, body);
 

@@ -1,4 +1,6 @@
+using Estudos.Interfaces.Repositories;
 using Estudos.Interfaces.Services;
+using Estudos.Repositories;
 using Estudos.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,6 +22,8 @@ namespace Estudos
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IHttpClientService, HttpClientService>();
+            services.AddTransient<IPostsService, PostsService>();
+            services.AddSingleton<IPostsRepository, PostsMySqlRepository>();
             
             services.AddControllers();
 
