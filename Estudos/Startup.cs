@@ -1,3 +1,5 @@
+using Estudos.Interfaces.Services;
+using Estudos.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -17,7 +19,11 @@ namespace Estudos
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IHttpClientService, HttpClientService>();
+            
             services.AddControllers();
+
+            services.AddSwaggerGen();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -25,6 +31,13 @@ namespace Estudos
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                
+                app.UseSwaggerUI(c => 
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Estudos .NetCore 3");
+                    c.RoutePrefix = string.Empty;
+                });
             }
 
             app.UseHttpsRedirection();
