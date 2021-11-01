@@ -1,8 +1,9 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Estudos.DTO;
 using Estudos.Entities;
+using Estudos.Interfaces.DAL;
 using Estudos.Interfaces.Repositories;
 using MySql.Data.MySqlClient;
 
@@ -10,62 +11,106 @@ namespace Estudos.Repositories
 {
     public class PostsMySqlRepository : IPostsRepository
     {
-        private readonly string _connStr = "server=172.17.0.2;user=root;database=estudos;port=3306;password=admin";
-        
-        public Task<Post> AddAsync(InboundAddPost data)
-        {
-            throw new System.NotImplementedException();
-        }
+        private readonly IMySqlDatabaseClient _dbClient;
 
-        public Task DeleteByIdAsync(int id)
+        public PostsMySqlRepository(IMySqlDatabaseClient dbClient)
         {
-            throw new System.NotImplementedException();
+            _dbClient = dbClient;
         }
 
         public async Task<IEnumerable<Post>> GetAllAsync()
         {
+            return await GetInternalAsync(null);
+        }
+
+        public async Task<Post> GetByIdAsync(int id)
+        {
+            var entities = await GetInternalAsync(id);
+
+            return entities.FirstOrDefault();
+        }
+
+        private async Task<IEnumerable<Post>> GetInternalAsync(int? postId)
+        {
+            using var conn = _dbClient.CreateDatabaseConnection();
+
+            var sql = $"SELECT id, user_id, title, body FROM posts";
+
+            if (postId.HasValue) 
+                sql += $" WHERE id = {postId}";
+    
+            using var cmd = new MySqlCommand(sql, conn);
+            using var reader = await cmd.ExecuteReaderAsync();
+
             var entities = new List<Post>();
-
-            MySqlConnection conn = new MySqlConnection(_connStr);
-            try
+            while (await reader.ReadAsync())
             {
-                conn.Open();
+                var id = int.Parse(reader["id"].ToString());
+                var userId = int.Parse(reader["user_id"].ToString());
+                var title = reader["title"].ToString();
+                var body = reader["body"].ToString();
 
-                string sql = "SELECT id, user_id, title, body FROM posts";
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-                var rdr = await cmd.ExecuteReaderAsync();
-
-                while (rdr.Read())
-                {
-                    var id = int.Parse(rdr["id"].ToString());
-                    var userId = int.Parse(rdr["user_id"].ToString());
-                    var title = rdr["title"].ToString();
-                    var body = rdr["body"].ToString();
-
-                    var entity = new Post(id, userId, title, body);
-
-                    entities.Add(entity);
-                }
-                rdr.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
+                entities.Add(new Post(id, userId, title, body));
             }
 
-            conn.Close();
-            Console.WriteLine("Done.");
             return entities;
         }
 
-        public Task<Post> GetByIdAsync(int id)
+        public async Task<int> AddAsync(InboundAddPost data)
         {
-            throw new System.NotImplementedException();
+            using var conn = _dbClient.CreateDatabaseConnection();
+
+            var sql = $"INSERT INTO posts (user_id, title, body) VALUES (@user_id, @title, @body)";
+
+            using var cmd = new MySqlCommand(sql, conn);
+
+            cmd.Parameters.AddWithValue("@user_id", data.UserId.ToString());
+            cmd.Parameters.AddWithValue("@title", data.Title);
+            cmd.Parameters.AddWithValue("@body", data.Body);
+
+            await cmd.ExecuteNonQueryAsync();
+
+            return await GetLastId(conn);
         }
 
-        public Task<Post> UpdateAsync(int id, InboundUpdatePost data)
+        private async Task<int> GetLastId(MySqlConnection conn)
         {
-            throw new System.NotImplementedException();
+            var sql = $"SELECT LAST_INSERT_ID() as id";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                return int.Parse(reader["id"].ToString());
+            }
+            
+            return 0;
+        }
+
+        public async Task DeleteByIdAsync(int id)
+        {
+            using var conn = _dbClient.CreateDatabaseConnection();
+
+            var sql = $"DELETE FROM posts WHERE id = {id}";
+    
+            using var cmd = new MySqlCommand(sql, conn);
+            
+            await cmd.ExecuteReaderAsync();
+        }
+
+        public async Task UpdateAsync(int id, InboundUpdatePost data)
+        {
+            using var conn = _dbClient.CreateDatabaseConnection();
+
+            var sql = $"UPDATE posts SET title = @title, body = @body";
+
+            using var cmd = new MySqlCommand(sql, conn);
+
+            cmd.Parameters.AddWithValue("@title", data.Title);
+            cmd.Parameters.AddWithValue("@body", data.Body);
+
+            await cmd.ExecuteNonQueryAsync();
         }
     }
 }

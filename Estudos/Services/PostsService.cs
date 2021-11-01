@@ -18,9 +18,9 @@ namespace Estudos.Services
         
         public async Task<OutboundPost> AddAsync(InboundAddPost data)
         {
-            var entity = await _repository.AddAsync(data);
-
-            return new OutboundPost(entity);
+            var id = await _repository.AddAsync(data);
+            
+            return await GetByIdAsync(id);
         }
 
         public async Task DeleteByIdAsync(int id)
@@ -44,9 +44,9 @@ namespace Estudos.Services
 
         public async Task<OutboundPost> UpdateAsync(int id, InboundUpdatePost data)
         {
-            var entity = await _repository.UpdateAsync(id, data);
+            await _repository.UpdateAsync(id, data);
 
-            return new OutboundPost(entity);
+            return await GetByIdAsync(id);
         }
     }
 }

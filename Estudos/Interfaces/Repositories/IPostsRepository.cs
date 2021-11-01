@@ -9,8 +9,8 @@ namespace Estudos.Interfaces.Repositories
     {
         Task<IEnumerable<Post>> GetAllAsync();
         Task<Post> GetByIdAsync(int id);
-        Task<Post> AddAsync(InboundAddPost data);
-        Task<Post> UpdateAsync(int id, InboundUpdatePost data);
+        Task<int> AddAsync(InboundAddPost data);
+        Task UpdateAsync(int id, InboundUpdatePost data);
         Task DeleteByIdAsync(int id);  
     }
 }

@@ -1,3 +1,6 @@
+using Estudos.AppSettings;
+using Estudos.DAL;
+using Estudos.Interfaces.DAL;
 using Estudos.Interfaces.Repositories;
 using Estudos.Interfaces.Services;
 using Estudos.Repositories;
@@ -21,9 +24,12 @@ namespace Estudos
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<DatabaseAppSettings>(Configuration.GetSection("ConnectionStringDatabase"));
+
             services.AddTransient<IHttpClientService, HttpClientService>();
             services.AddTransient<IPostsService, PostsService>();
             services.AddSingleton<IPostsRepository, PostsMySqlRepository>();
+            services.AddSingleton<IMySqlDatabaseClient, MySqlDatabaseClient>();
             
             services.AddControllers();
 
