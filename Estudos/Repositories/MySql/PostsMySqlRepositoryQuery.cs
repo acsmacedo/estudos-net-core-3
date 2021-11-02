@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Estudos.DTO;
 using Estudos.Entities;
+using Estudos.Helpers.Extensions;
 using MySql.Data.MySqlClient;
 
 namespace Estudos.Repositories.MySql
@@ -11,16 +12,37 @@ namespace Estudos.Repositories.MySql
     {
         public async Task<IEnumerable<Post>> GetQueryAsync(
             MySqlConnection conn,
-            IEnumerable<int> ids)
+            InboundSearchPosts search)
         {
             var sql = $"SELECT id, user_id, title, body FROM posts";
 
-            if (ids != null && ids.Any()) 
-            {
-                sql += $" WHERE id IN ({string.Join(",", ids)})";
-            }
+            var filters = new List<string>();
+
+            var ids = search.Ids.SplitToInt();
+            var userIds = search.UserIds.SplitToInt();
+
+            if (ids.Any())
+                filters.Add($"id IN ({string.Join(",", ids)})");
+
+            if (userIds.Any())
+               filters.Add($"user_id IN ({string.Join(",", userIds)})");
+
+            if (!string.IsNullOrEmpty(search.Title))
+               filters.Add($"title LIKE @title");
+
+            if (!string.IsNullOrEmpty(search.Body))
+               filters.Add($"body LIKE @body");
+
+            if (filters.Any())
+                sql += $" WHERE {string.Join(" AND ", filters)}";
                 
             using var cmd = new MySqlCommand(sql, conn);
+
+            if (!string.IsNullOrEmpty(search.Title))
+                cmd.Parameters.AddWithValue("@title", "%" + search.Title + "%");
+
+            if (!string.IsNullOrEmpty(search.Body))
+               cmd.Parameters.AddWithValue("@body", "%" + search.Body + "%");
 
             using var reader = await cmd.ExecuteReaderAsync();
 
@@ -107,5 +129,6 @@ namespace Estudos.Repositories.MySql
             
             return 0;
         }
+
     }
 }

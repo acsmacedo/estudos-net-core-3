@@ -14,7 +14,7 @@ namespace Estudos.Interfaces.Repositories
 
     public interface IPostsRepositoryQuery
     {
-        Task<IEnumerable<Post>> GetAsync(IEnumerable<int> ids);
+        Task<IEnumerable<Post>> GetAsync(InboundSearchPosts search);
     }
 
     public interface IPostsRepository : IPostsRepositoryCommand, IPostsRepositoryQuery

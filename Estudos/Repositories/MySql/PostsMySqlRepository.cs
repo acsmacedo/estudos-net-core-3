@@ -19,11 +19,11 @@ namespace Estudos.Repositories.MySql
             _query = new PostsMySqlRepositoryQuery();
         }
 
-        public async Task<IEnumerable<Post>> GetAsync(IEnumerable<int> ids)
+        public async Task<IEnumerable<Post>> GetAsync(InboundSearchPosts search)
         {
             using var conn = _dbClient.CreateDatabaseConnection();
 
-            return await _query.GetQueryAsync(conn, ids);
+            return await _query.GetQueryAsync(conn, search);
         }
 
         public async Task DeleteAsync(IEnumerable<int> ids)

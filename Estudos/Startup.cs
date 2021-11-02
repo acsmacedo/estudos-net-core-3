@@ -35,6 +35,7 @@ namespace Estudos
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                
                 app.UseSwagger();
                 
                 app.UseSwaggerUI(c => 
