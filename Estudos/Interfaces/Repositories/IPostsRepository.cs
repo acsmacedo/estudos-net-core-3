@@ -5,12 +5,19 @@ using Estudos.Entities;
 
 namespace Estudos.Interfaces.Repositories
 {
-    public interface IPostsRepository
+    public interface IPostsRepositoryCommand
     {
-        Task<IEnumerable<Post>> GetAllAsync();
-        Task<Post> GetByIdAsync(int id);
-        Task<int> AddAsync(InboundAddPost data);
-        Task UpdateAsync(int id, InboundUpdatePost data);
-        Task DeleteByIdAsync(int id);  
+        Task DeleteAsync(IEnumerable<int> ids); 
+        Task UpdateAsync(IEnumerable<InboundUpdatePost> data);
+        Task<IEnumerable<int>> AddAsync(IEnumerable<InboundAddPost> data);
+    }
+
+    public interface IPostsRepositoryQuery
+    {
+        Task<IEnumerable<Post>> GetAsync(IEnumerable<int> ids);
+    }
+
+    public interface IPostsRepository : IPostsRepositoryCommand, IPostsRepositoryQuery
+    {
     }
 }

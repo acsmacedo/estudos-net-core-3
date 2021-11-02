@@ -45,7 +45,7 @@ namespace Estudos.Controllers
         [Route("{id}")]
         public async Task<IActionResult> UpdateAsync(int id, InboundUpdatePost data)
         {
-            var result = await _service.UpdateAsync(id, data);
+            var result = await _service.UpdateAsync(data);
 
             return Ok(result);
         }

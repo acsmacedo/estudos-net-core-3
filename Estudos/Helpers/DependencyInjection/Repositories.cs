@@ -14,8 +14,13 @@ namespace Estudos.Helpers.DependencyInjection
         {
             if (databaseName == "MySql")
             {
-                services.AddSingleton<IMySqlDatabaseClient, MySqlDatabaseClient>();
-                services.AddSingleton<IPostsRepository, PostsMySqlRepository>();
+                services.AddTransient<IMySqlDatabaseClient, MySqlDatabaseClient>();
+                
+                services.AddTransient<IPostsRepository, PostsMySqlRepository>();
+                services.AddTransient<IPostsRepositoryQuery>(provider => 
+                    provider.GetRequiredService<IPostsRepository>());
+                services.AddTransient<IPostsRepositoryCommand>(provider => 
+                    provider.GetRequiredService<IPostsRepository>());
             }
 
             return services;

@@ -10,7 +10,12 @@ namespace Estudos.Helpers.DependencyInjection
             this IServiceCollection services) 
         {
             services.AddTransient<IHttpClientService, HttpClientService>();
+            
             services.AddTransient<IPostsService, PostsService>();
+            services.AddTransient<IPostsServiceQuery>(provider => 
+                provider.GetRequiredService<IPostsService>());
+            services.AddTransient<IPostsServiceCommand>(provider => 
+                provider.GetRequiredService<IPostsService>());
 
             return services;
         } 

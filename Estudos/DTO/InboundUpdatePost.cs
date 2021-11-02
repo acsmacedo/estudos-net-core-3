@@ -2,7 +2,8 @@ namespace Estudos.DTO
 {
     public class InboundUpdatePost
     {
-        public string Title { get; set; }
-        public string Body { get; set; }
+        public int Id { get; set; }
+        public string NewTitle { get; set; }
+        public string NewBody { get; set; }
     }
 }

@@ -8,8 +8,8 @@ namespace Estudos.Entities
         public string Body { get; }
 
         public Post(
-            int userId, 
             int id, 
+            int userId,
             string title, 
             string body)
         {
