@@ -16,7 +16,7 @@ namespace Estudos.DAL
 
         public MySqlConnection CreateDatabaseConnection()
         {
-            var conn = new MySqlConnection(_settings.Mysql);
+            var conn = new MySqlConnection(_settings.ConnectionString);
             conn.Open();
 
             return conn;

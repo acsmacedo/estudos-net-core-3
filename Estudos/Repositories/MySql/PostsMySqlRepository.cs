@@ -7,7 +7,7 @@ using Estudos.Interfaces.DAL;
 using Estudos.Interfaces.Repositories;
 using MySql.Data.MySqlClient;
 
-namespace Estudos.Repositories
+namespace Estudos.Repositories.MySql
 {
     public class PostsMySqlRepository : IPostsRepository
     {
@@ -37,9 +37,17 @@ namespace Estudos.Repositories
             var sql = $"SELECT id, user_id, title, body FROM posts";
 
             if (postId.HasValue) 
-                sql += $" WHERE id = {postId}";
-    
+            {
+                sql += $" WHERE id = @id";
+            }
+                
             using var cmd = new MySqlCommand(sql, conn);
+
+            if (postId.HasValue) 
+            {
+                cmd.Parameters.AddWithValue("@id", postId.Value);
+            }
+
             using var reader = await cmd.ExecuteReaderAsync();
 
             var entities = new List<Post>();
@@ -92,9 +100,11 @@ namespace Estudos.Repositories
         {
             using var conn = _dbClient.CreateDatabaseConnection();
 
-            var sql = $"DELETE FROM posts WHERE id = {id}";
+            var sql = $"DELETE FROM posts WHERE id = @id";
     
             using var cmd = new MySqlCommand(sql, conn);
+
+            cmd.Parameters.AddWithValue("@id", id.ToString());
             
             await cmd.ExecuteReaderAsync();
         }
