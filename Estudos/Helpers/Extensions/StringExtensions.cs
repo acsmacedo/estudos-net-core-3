@@ -16,7 +16,7 @@ namespace Estudos.Helpers.Extensions
                 .Split(separators)
                 .Select(x => 
                 {
-                    int.TryParse(x, out var value);
+                    int.TryParse(x.Trim(), out var value);
                     return value;
                 });
         }

@@ -129,6 +129,5 @@ namespace Estudos.Repositories.MySql
             
             return 0;
         }
-
     }
 }
